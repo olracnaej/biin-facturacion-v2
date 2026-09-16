@@ -4,24 +4,21 @@ import { prisma } from "../../../lib/prisma";
 async function guardarUsuario(formData: FormData) {
   "use server";
 
-  console.log("Entró a guardarUsuario");
-
   const correo = formData.get("correo") as string;
   const password = formData.get("password") as string;
 
   if (!correo || !password) {
-    return;
+    redirect("/gestion-usuarios/nuevo-usuario?error=Campos+incompletos");
   }
 
+  // Verifica si el correo ya existe
   const usuarioExistente = await prisma.usuario.findUnique({
-    where: {
-      correo,
-    },
+    where: { correo },
   });
 
   if (usuarioExistente) {
-    console.log("El correo ya existe");
-    return;
+    // Redirige pasando el error en la URL para mostrarlo en pantalla
+    redirect("/gestion-usuarios/nuevo-usuario?error=El+correo+ya+existe");
   }
 
   await prisma.usuario.create({
@@ -31,18 +28,30 @@ async function guardarUsuario(formData: FormData) {
     },
   });
 
-  console.log("Usuario guardado exitosamente");
-
-  // Redirige al listado de usuarios tras guardar
+  // Redirige al listado tras guardar
   redirect("/gestion-usuarios");
 }
 
-export default function NuevoUsuarioPage() {
+export default async function NuevoUsuarioPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const params = await searchParams;
+  const error = params?.error;
+
   return (
     <main>
       <h1>Nuevo Usuario</h1>
 
-      {/* Se abre correctamente la etiqueta form */}
+      {/* Muestra el mensaje si viene en la URL */}
+      {error && (
+        <div style={{ color: "red", marginBottom: "1rem" }}>
+          {error}
+        </div>
+      )}
+
+      {/* Formulario corregido con su action correspondiente */}
       <form action={guardarUsuario}>
         <div>
           <label htmlFor="correo">Correo</label>
