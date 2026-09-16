@@ -1,12 +1,26 @@
+import { redirect } from "next/navigation";
 import { prisma } from "../../../lib/prisma";
 
 async function guardarUsuario(formData: FormData) {
   "use server";
 
+  console.log("Entró a guardarUsuario");
+
   const correo = formData.get("correo") as string;
   const password = formData.get("password") as string;
 
   if (!correo || !password) {
+    return;
+  }
+
+  const usuarioExistente = await prisma.usuario.findUnique({
+    where: {
+      correo,
+    },
+  });
+
+  if (usuarioExistente) {
+    console.log("El correo ya existe");
     return;
   }
 
@@ -18,6 +32,9 @@ async function guardarUsuario(formData: FormData) {
   });
 
   console.log("Usuario guardado exitosamente");
+
+  // Redirige al listado de usuarios tras guardar
+  redirect("/gestion-usuarios");
 }
 
 export default function NuevoUsuarioPage() {
@@ -25,7 +42,7 @@ export default function NuevoUsuarioPage() {
     <main>
       <h1>Nuevo Usuario</h1>
 
-      {/* Se abre correctamente la etiqueta form con la action asociada */}
+      {/* Se abre correctamente la etiqueta form */}
       <form action={guardarUsuario}>
         <div>
           <label htmlFor="correo">Correo</label>
