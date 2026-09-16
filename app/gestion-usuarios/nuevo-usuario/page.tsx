@@ -17,7 +17,6 @@ async function guardarUsuario(formData: FormData) {
   });
 
   if (usuarioExistente) {
-    // Redirige pasando el error en la URL para mostrarlo en pantalla
     redirect("/gestion-usuarios/nuevo-usuario?error=El+correo+ya+existe");
   }
 
@@ -29,8 +28,8 @@ async function guardarUsuario(formData: FormData) {
   });
 
   // Redirige al listado tras guardar
-  redirect("/gestion-usuarios");
-}
+  redirect("/gestion-usuarios?success=Usuario+creado+correctamente");
+} // <-- Se agregó la llave de cierre que faltaba aquí
 
 export default async function NuevoUsuarioPage({
   searchParams,
@@ -44,14 +43,12 @@ export default async function NuevoUsuarioPage({
     <main>
       <h1>Nuevo Usuario</h1>
 
-      {/* Muestra el mensaje si viene en la URL */}
       {error && (
         <div style={{ color: "red", marginBottom: "1rem" }}>
           {error}
         </div>
       )}
 
-      {/* Formulario corregido con su action correspondiente */}
       <form action={guardarUsuario}>
         <div>
           <label htmlFor="correo">Correo</label>
