@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { prisma } from "../../lib/prisma";
+import { verificarSesion } from "../../lib/session";
 
 async function eliminarUsuario(formData: FormData) {
   "use server";
@@ -20,6 +22,16 @@ async function eliminarUsuario(formData: FormData) {
   redirect("/gestion-usuarios?success=Usuario+eliminado+correctamente");
 }
 
+async function cerrarSesion() {
+  "use server";
+
+  const cookieStore = await cookies();
+
+  cookieStore.delete("auth_token");
+
+  redirect("/login");
+}
+
 export default async function GestionUsuariosPage({
   searchParams,
 }: {
@@ -28,23 +40,39 @@ export default async function GestionUsuariosPage({
   const params = await searchParams;
   const success = params?.success;
 
-  // Se obtiene la lista de usuarios desde la base de datos
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth_token")?.value;
+
+  if (!token) {
+    redirect("/login");
+  }
+
+  await verificarSesion(token);
+
   const usuarios = await prisma.usuario.findMany();
 
   return (
-    <main>
-      <h1>Gestión de Usuarios</h1>
+    <main style={{ padding: "2rem" }}>
+      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+        <h1>Gestión de Usuarios</h1>
 
-      {/* Mensaje de éxito si viene en la URL */}
+        {/* AGREGADO: Formulario para ejecutar cerrarSesion */}
+        <form action={cerrarSesion}>
+          <button type="submit">Cerrar Sesión</button>
+        </form>
+      </header>
+
       {success && (
         <div style={{ color: "green", marginBottom: "1rem" }}>
           {success}
         </div>
       )}
 
-      <Link href="/gestion-usuarios/nuevo-usuario">
-        <button>Nuevo Usuario</button>
-      </Link>
+      <div style={{ marginBottom: "1rem" }}>
+        <Link href="/gestion-usuarios/nuevo-usuario">
+          <button>Nuevo Usuario</button>
+        </Link>
+      </div>
 
       <table>
         <thead>
@@ -54,20 +82,28 @@ export default async function GestionUsuariosPage({
             <th>Acciones</th>
           </tr>
         </thead>
+
         <tbody>
           {usuarios.map((usuario) => (
             <tr key={usuario.id}>
               <td>{usuario.id}</td>
               <td>{usuario.correo}</td>
+
               <td style={{ display: "flex", gap: "0.5rem" }}>
                 <Link href={`/gestion-usuarios/editar-usuario/${usuario.id}`}>
                   <button>Editar</button>
                 </Link>
 
-                {/* Formulario para ejecutar la Server Action de eliminación */}
                 <form action={eliminarUsuario}>
-                  <input type="hidden" name="id" value={usuario.id} />
-                  <button type="submit">Eliminar</button>
+                  <input
+                    type="hidden"
+                    name="id"
+                    value={usuario.id}
+                  />
+
+                  <button type="submit">
+                    Eliminar
+                  </button>
                 </form>
               </td>
             </tr>

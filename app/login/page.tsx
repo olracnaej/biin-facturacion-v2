@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import bcrypt from "bcrypt";
 import { prisma } from "../../lib/prisma";
+import { crearSesion } from "../../lib/session";
+import { cookies } from "next/headers";
 
 async function iniciarSesion(formData: FormData) {
   "use server";
@@ -32,6 +34,19 @@ async function iniciarSesion(formData: FormData) {
   if (!passwordValido) {
     redirect("/login?error=Credenciales+incorrectas");
   }
+
+  // Genera el token JWT
+  const token = await crearSesion(usuario.correo);
+
+  // Guardar el JWT en una cookie HTTP
+  const cookieStore = await cookies();
+  cookieStore.set("auth_token", token, {
+    httpOnly: true, // Evita acceso mediante JavaScript en el cliente
+    secure: process.env.NODE_ENV === "production", // Encriptación HTTPS en producción
+    sameSite: "lax", // Protección contra ataques CSRF
+    maxAge: 60 * 60 * 24 * 7, // Duración: 7 días en segundos
+    path: "/", // Disponible en todas las rutas de la app
+  });
 
   // Redirige al panel tras un inicio de sesión exitoso
   redirect("/gestion-usuarios");
