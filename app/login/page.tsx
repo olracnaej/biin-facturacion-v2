@@ -49,7 +49,7 @@ async function iniciarSesion(formData: FormData) {
   });
 
   // Redirige al panel tras un inicio de sesión exitoso
-  redirect("/gestion-usuarios");
+  redirect("/facturas");
 }
 
 export default async function LoginPage({
