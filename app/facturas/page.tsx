@@ -24,7 +24,6 @@ export default function FacturasPage() {
   const [mensajeError, setMensajeError] = useState<string>("");
   const [mensajeExito, setMensajeExito] = useState<string>("");
 
-  // Evita que se dispare un segundo navigator.share() mientras el anterior sigue en curso
   const compartiendoRef = useRef(false);
 
   async function cerrarSesion(): Promise<void> {
@@ -100,7 +99,7 @@ export default function FacturasPage() {
   }
 
   async function compartirImagen(): Promise<void> {
-    if (compartiendoRef.current) return; // ya hay un share en curso, ignorar el clic
+    if (compartiendoRef.current) return;
     compartiendoRef.current = true;
 
     const factura = document.getElementById("resumenFactura");
@@ -194,12 +193,75 @@ export default function FacturasPage() {
 
           {mostrarResumen && (
             <div style={{ backgroundColor: "#071B3B", padding: "1.5rem", borderRadius: "10px" }}>
-              <div id="resumenFactura" style={{ backgroundColor: "#ffffff", color: "#333333", padding: "2rem", borderRadius: "8px", marginBottom: "1.5rem", textAlign: "center" }}>
-                <h2 style={{ color: "#031129", margin: "0 0 1rem 0" }}>BI-IN LOGISTICS</h2>
-                <p style={{ margin: "0.5rem 0" }}><strong>Cliente:</strong> <span id="nombreResumen">{nombreResumen}</span></p>
-                <p style={{ margin: "0.5rem 0" }}><strong>Provincia:</strong> {provincia}</p>
-                <p style={{ margin: "0.5rem 0" }}><strong>Peso:</strong> {peso} kg</p>
-                <h3 style={{ color: "#F58220", marginTop: "1.5rem" }}>Total: <span id="totalResumen">{totalResumen}</span></h3>
+              <div
+                id="resumenFactura"
+                style={{
+                  backgroundColor: "#0A1F44",
+                  color: "#FFFFFF",
+                  padding: "2rem 1.5rem",
+                  borderRadius: "12px",
+                  marginBottom: "1.5rem",
+                  textAlign: "center",
+                  border: "2px solid #F58220",
+                }}
+              >
+                <img
+                  src="/logo.png"
+                  alt="BI-IN Logistics Logo"
+                  style={{ maxWidth: "150px", height: "auto", display: "block", margin: "0 auto 1.5rem auto" }}
+                />
+
+                <h2 style={{ color: "#F58220", margin: "0 0 0.3rem 0", fontSize: "1.4rem" }}>
+                  ¡BUENAS NOTICIAS!
+                </h2>
+                <p style={{ color: "#FFFFFF", margin: "0 0 0.2rem 0", fontSize: "1.1rem", fontWeight: "bold" }}>
+                  TU PAQUETE ESTÁ LISTO
+                </p>
+                <p style={{ color: "#FFFFFF", margin: "0 0 1.5rem 0" }}>
+                  para retirar 📦
+                </p>
+
+                <p style={{ color: "#A9BEDD", margin: "0 0 0.5rem 0" }}>
+                  Aquí está el detalle de tu factura
+                </p>
+                <p
+                  id="nombreResumen"
+                  style={{
+                    color: "#FFFFFF",
+                    fontWeight: "bold",
+                    fontSize: "1.3rem",
+                    margin: "0 0 1.5rem 0",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {nombreResumen}
+                </p>
+
+                <p style={{ color: "#A9BEDD", margin: "0 0 0.3rem 0" }}>
+                  TOTAL A PAGAR
+                </p>
+                <h3 id="totalResumen" style={{ color: "#F58220", fontSize: "2.2rem", margin: "0 0 1.5rem 0" }}>
+                  {totalResumen}
+                </h3>
+
+                <div
+                  style={{
+                    border: "1px dashed #F58220",
+                    borderRadius: "8px",
+                    padding: "0.75rem",
+                    marginBottom: "1.5rem",
+                  }}
+                >
+                  <p style={{ margin: 0, color: "#FFFFFF" }}>
+                    SINPE MÓVIL: <strong style={{ color: "#F58220" }}>6350-7070</strong>
+                  </p>
+                </div>
+
+                <p style={{ color: "#FFFFFF", margin: "0.3rem 0" }}>Por favor, enviar el comprobante.</p>
+                <p style={{ color: "#FFFFFF", margin: "0.3rem 0" }}>Gracias por confiar en nosotros.</p>
+                <p style={{ color: "#F58220", fontWeight: "bold", margin: "0.5rem 0 0 0" }}>
+                  ¡Estamos para servirte!
+                </p>
               </div>
 
               <div id="accionesFactura" style={{ display: "flex", gap: "0.5rem" }}>
