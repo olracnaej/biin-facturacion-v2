@@ -230,11 +230,15 @@ export default function FacturasPage() {
                     color: "#FFFFFF",
                     fontWeight: "bold",
                     fontSize: "1.3rem",
-                    margin: "0 0 1.5rem 0",
+                    margin: "0 0 0.5rem 0",
                     textTransform: "uppercase",
                   }}
                 >
                   {nombreResumen}
+                </p>
+
+                <p style={{ color: "#A9BEDD", margin: "0 0 1.5rem 0" }}>
+                  Peso: <strong style={{ color: "#FFFFFF" }}>{peso} kg</strong>
                 </p>
 
                 <p style={{ color: "#A9BEDD", margin: "0 0 0.3rem 0" }}>
