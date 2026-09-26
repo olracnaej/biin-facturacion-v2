@@ -14,7 +14,6 @@ async function iniciarSesion(formData: FormData) {
     redirect("/login?error=Campos+incompletos");
   }
 
-  // Busca el usuario por correo
   const usuario = await prisma.usuario.findUnique({
     where: {
       correo,
@@ -25,7 +24,6 @@ async function iniciarSesion(formData: FormData) {
     redirect("/login?error=Credenciales+incorrectas");
   }
 
-  // Compara la contraseña ingresada con el hash guardado en la base de datos
   const passwordValido = await bcrypt.compare(
     password,
     usuario.password
@@ -35,20 +33,18 @@ async function iniciarSesion(formData: FormData) {
     redirect("/login?error=Credenciales+incorrectas");
   }
 
-  // Genera el token JWT
   const token = await crearSesion(usuario.correo);
 
-  // Guardar el JWT en una cookie HTTP
   const cookieStore = await cookies();
+
   cookieStore.set("auth_token", token, {
-    httpOnly: true, // Evita acceso mediante JavaScript en el cliente
-    secure: process.env.NODE_ENV === "production", // Encriptación HTTPS en producción
-    sameSite: "lax", // Protección contra ataques CSRF
-    maxAge: 60 * 60 * 24 * 7, // Duración: 7 días en segundos
-    path: "/", // Disponible en todas las rutas de la app
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 60 * 60 * 24 * 7,
+    path: "/",
   });
 
-  // Redirige al panel tras un inicio de sesión exitoso
   redirect("/facturas");
 }
 
@@ -61,40 +57,152 @@ export default async function LoginPage({
   const error = params?.error;
 
   return (
-    <main>
-      <h1>Iniciar Sesión</h1>
-
-      {error && (
-        <div style={{ color: "red", marginBottom: "1rem" }}>
-          {error}
-        </div>
-      )}
-
-      <form action={iniciarSesion}>
-        <div>
-          <label htmlFor="correo">Correo</label>
-          <input
-            id="correo"
-            name="correo"
-            type="email"
-            required
+    <div
+      style={{
+        backgroundColor: "#031129",
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "1rem",
+      }}
+    >
+      <main
+        style={{
+          width: "100%",
+          maxWidth: "450px",
+          backgroundColor: "#071B3B",
+          padding: "2rem",
+          borderRadius: "12px",
+          border: "2px solid #F58220",
+        }}
+      >
+        <div
+          style={{
+            textAlign: "center",
+            marginBottom: "2rem",
+          }}
+        >
+          <img
+            src="/logo.png"
+            alt="BI-IN Logo"
+            style={{
+              width: "100px",
+              height: "auto",
+              display: "block",
+              margin: "0 auto 1rem auto",
+            }}
           />
+
+          <h1
+            style={{
+              color: "#F58220",
+              margin: 0,
+            }}
+          >
+            BI-IN Facturación
+          </h1>
         </div>
 
-        <div>
-          <label htmlFor="password">Contraseña</label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            required
-          />
-        </div>
+        {error && (
+          <div
+            style={{
+              backgroundColor: "#7A1F1F",
+              color: "#FFFFFF",
+              padding: "0.75rem",
+              borderRadius: "6px",
+              marginBottom: "1rem",
+            }}
+          >
+            {error}
+          </div>
+        )}
 
-        <button type="submit">
-          Ingresar
-        </button>
-      </form>
-    </main>
+        <form action={iniciarSesion}>
+          <div
+            style={{
+              marginBottom: "1rem",
+            }}
+          >
+            <label
+              htmlFor="correo"
+              style={{
+                display: "block",
+                color: "#FFFFFF",
+                marginBottom: "0.5rem",
+              }}
+            >
+              Correo
+            </label>
+
+            <input
+              id="correo"
+              name="correo"
+              type="email"
+              required
+              style={{
+                width: "100%",
+                padding: "0.75rem",
+                borderRadius: "6px",
+                border: "1px solid #1E3A6D",
+                backgroundColor: "#031129",
+                color: "#FFFFFF",
+                boxSizing: "border-box",
+              }}
+            />
+          </div>
+
+          <div
+            style={{
+              marginBottom: "1.5rem",
+            }}
+          >
+            <label
+              htmlFor="password"
+              style={{
+                display: "block",
+                color: "#FFFFFF",
+                marginBottom: "0.5rem",
+              }}
+            >
+              Contraseña
+            </label>
+
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              style={{
+                width: "100%",
+                padding: "0.75rem",
+                borderRadius: "6px",
+                border: "1px solid #1E3A6D",
+                backgroundColor: "#031129",
+                color: "#FFFFFF",
+                boxSizing: "border-box",
+              }}
+            />
+          </div>
+
+          <button
+            type="submit"
+            style={{
+              width: "100%",
+              padding: "0.9rem",
+              backgroundColor: "#F58220",
+              color: "#FFFFFF",
+              border: "none",
+              borderRadius: "6px",
+              fontWeight: "bold",
+              cursor: "pointer",
+              fontSize: "1rem",
+            }}
+          >
+            Ingresar
+          </button>
+        </form>
+      </main>
+    </div>
   );
 }
